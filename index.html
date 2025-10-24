@@ -16,100 +16,6 @@
             position: relative;
         }
 
-        /* Meter Component Styling */
-        .meter {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            width: 300px; /* Fixed width for alignment */
-        }
-
-        .meter p {
-            margin: 0 0 5px 0;
-            font-size: 14px;
-            color: #888888;
-        }
-        
-        /* Logo Styling for each meter */
-        .meter-logo {
-            font-size: 32px;
-            font-weight: bold;
-            position: relative;
-            margin-bottom: 15px;
-            color: #000;
-        }
-        
-        .meter-logo::before {
-            content: '';
-            position: absolute;
-            width: 50px;
-            height: 25px;
-            border: 8px solid #E50914;
-            border-bottom: none;
-            border-radius: 50px 50px 0 0;
-            top: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .meter-logo::after {
-            content: '';
-            position: absolute;
-            width: 25px;
-            height: 12.5px;
-            border: 6px solid #E50914;
-            border-bottom: none;
-            border-radius: 25px 25px 0 0;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-
-        /* Data Usage Display Area */
-        .data-usage-container {
-            display: flex;
-            align-items: flex-end;
-            line-height: 1;
-        }
-
-        .data-usage-value {
-            font-size: 52px;
-            font-weight: 300;
-            color: #000000;
-        }
-
-        .data-usage-unit {
-            font-size: 20px;
-            font-weight: 300;
-            color: #424242;
-            margin-left: 10px;
-            margin-bottom: 8px;
-        }
-
-        /* Positioning the meters in corners */
-        #meter-megabit { top: 8%; left: 5%; }
-        #meter-megabyte { top: 8%; left: 50%; transform: translateX(-50%); }
-        #meter-gigabit { top: 8%; right: 5%; }
-        
-        #meter-gigabyte { bottom: 8%; left: 5%; }
-        #meter-terabit { bottom: 8%; left: 50%; transform: translateX(-50%); }
-        #meter-terabyte { bottom: 8%; right: 5%; }
-
-        /* Real-time meters */
-        .real-time-meter {
-            position: absolute;
-        }
-        .real-time-meter .data-usage-value { font-size: 36px; }
-        .real-time-meter .data-usage-unit { font-size: 16px; }
-
-        #meter-realtime-mbps { top: 50%; left: 20%; transform: translate(-50%, -50%); }
-        #meter-realtime-mbs { top: 50%; right: 20%; transform: translate(50%, -50%);}
-
-
         /* Central Controls */
         .controls-container {
             position: absolute;
@@ -156,7 +62,13 @@
             transform: translateX(-50%);
         }
 
-        #refresh-button {
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .control-button {
             width: 40px;
             height: 40px;
             border: 2px solid #9E9E9E;
@@ -170,11 +82,17 @@
             font-size: 24px;
             font-weight: bold;
             transition: transform 0.8s ease-in-out;
-            margin-top: 15px;
         }
 
         #refresh-button.testing {
             transform: rotate(360deg);
+        }
+        
+        #test-status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #424242;
+            display: none; /* Initially hidden */
         }
 
         /* Footer */
@@ -203,75 +121,14 @@
     </style>
 </head>
 <body>
-
-    <!-- Data Meters -->
-    <div class="meter" id="meter-megabit">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="megabit-value">0.00</span>
-            <span class="data-usage-unit">Mb</span>
-        </div>
-    </div>
-    <div class="meter" id="meter-megabyte">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="megabyte-value">0.00</span>
-            <span class="data-usage-unit">MB</span>
-        </div>
-    </div>
-    <div class="meter" id="meter-gigabit">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="gigabit-value">0.00</span>
-            <span class="data-usage-unit">Gb</span>
-        </div>
-    </div>
-    <div class="meter" id="meter-gigabyte">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="gigabyte-value-disp">0.00</span>
-            <span class="data-usage-unit">GB</span>
-        </div>
-    </div>
-    <div class="meter" id="meter-terabit">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="terabit-value">0.00</span>
-            <span class="data-usage-unit">Tb</span>
-        </div>
-    </div>
-    <div class="meter" id="meter-terabyte">
-        <div class="meter-logo">FAST</div>
-        <p>Total data used:</p>
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="terabyte-value">0.00</span>
-            <span class="data-usage-unit">TB</span>
-        </div>
-    </div>
-
-    <!-- Real-time Speed Indicators -->
-    <div class="real-time-meter" id="meter-realtime-mbps">
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="realtime-mbps">0.00</span>
-            <span class="data-usage-unit">Mbps</span>
-        </div>
-    </div>
-    <div class="real-time-meter" id="meter-realtime-mbs">
-        <div class="data-usage-container">
-            <span class="data-usage-value" id="realtime-mbs">0.00</span>
-            <span class="data-usage-unit">MB/s</span>
-        </div>
-    </div>
-
     <!-- Central Controls -->
     <div class="controls-container">
         <div class="central-logo">FAST</div>
-        <button id="refresh-button">&#8635;</button>
+        <div class="button-container">
+            <button id="refresh-button" class="control-button">&#8635;</button>
+            <button id="pause-button" class="control-button">&#10074;&#10074;</button>
+        </div>
+        <div id="test-status">Test Running...</div>
     </div>
 
     <footer>
@@ -279,30 +136,19 @@
     </footer>
 
     <script>
-        const megabitElement = document.getElementById('megabit-value');
-        const megabyteElement = document.getElementById('megabyte-value');
-        const gigabitElement = document.getElementById('gigabit-value');
-        const gigabyteElement = document.getElementById('gigabyte-value-disp');
-        const terabitElement = document.getElementById('terabit-value');
-        const terabyteElement = document.getElementById('terabyte-value');
-        const realtimeMbpsElement = document.getElementById('realtime-mbps');
-        const realtimeMbsElement = document.getElementById('realtime-mbs');
-        
         const refreshButton = document.getElementById('refresh-button');
+        const pauseButton = document.getElementById('pause-button');
+        const testStatusElement = document.getElementById('test-status');
         
         const DOWNLOAD_TEST_FILE = 'https://cachefly.cachefly.net/10mb.test';
         const CONCURRENT_DOWNLOADS = 10;
-        const STORAGE_KEY = 'totalDataUsed';
         
         let continueTesting = false;
+        let isPaused = false;
         let activeXHRs = [];
-        let totalDownloadedBytes = parseFloat(localStorage.getItem(STORAGE_KEY)) || 0;
+        let totalDownloadedBytes = 0;
         
-        let lastProgressTime = Date.now();
-        let bytesSinceLastProgress = 0;
-
-        // This function resets and restarts the test
-        function resetAndRestartTest() {
+        function resetTest() {
             if (continueTesting) {
                 continueTesting = false; 
                 activeXHRs.forEach(xhr => xhr.abort());
@@ -310,86 +156,29 @@
             }
             
             totalDownloadedBytes = 0;
-            localStorage.removeItem(STORAGE_KEY);
-            updateDataUsageDisplay(); // Update display to show 0
-            
-            // Restart the test after a short delay
-            setTimeout(startContinuousTesting, 100);
-        }
-
-        function updateDataUsageDisplay() {
-            const megabits = (totalDownloadedBytes * 8) / (1024 * 1024);
-            const megabytes = totalDownloadedBytes / (1024 * 1024);
-            const gigabits = (totalDownloadedBytes * 8) / (1024 * 1024 * 1024);
-            const gigabytes = totalDownloadedBytes / (1024 * 1024 * 1024);
-            const terabits = (totalDownloadedBytes * 8) / (1024 * 1024 * 1024 * 1024);
-            const terabytes = totalDownloadedBytes / (1024 * 1024 * 1024 * 1024);
-
-            megabitElement.textContent = megabits.toFixed(2);
-            megabyteElement.textContent = megabytes.toFixed(2);
-            gigabitElement.textContent = gigabits.toFixed(2);
-            gigabyteElement.textContent = gigabytes.toFixed(2);
-            terabitElement.textContent = terabits.toFixed(2);
-            terabyteElement.textContent = terabytes.toFixed(2);
-
-            // *** ADDED CHECK: Reset if data usage reaches 1024 MB ***
-            if (megabytes >= 1024) {
-                resetAndRestartTest();
-            }
-        }
-
-        function updateRealTimeSpeed(bytes, durationMs) {
-            if (durationMs === 0) return;
-            const bps = (bytes * 8) / (durationMs / 1000); // bits per second
-            const Bps = bytes / (durationMs / 1000); // Bytes per second
-
-            const mbps = bps / 1000000;
-            const mbs = Bps / 1000000;
-            
-            realtimeMbpsElement.textContent = mbps.toFixed(2);
-            realtimeMbsElement.textContent = mbs.toFixed(2);
+            isPaused = false;
+            pauseButton.innerHTML = '&#10074;&#10074;';
+            testStatusElement.style.display = 'none';
+            refreshButton.classList.remove('testing');
         }
 
         function runSingleDownload() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const xhr = new XMLHttpRequest();
                 activeXHRs.push(xhr);
                 
-                let lastLoaded = 0;
-
                 xhr.open('GET', `${DOWNLOAD_TEST_FILE}?r=${Date.now()}&i=${Math.random()}`, true);
                 
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable) {
-                         const bytesDiff = event.loaded - lastLoaded;
-                         totalDownloadedBytes += bytesDiff;
-                         bytesSinceLastProgress += bytesDiff;
-                         lastLoaded = event.loaded;
-                         
-                         const now = Date.now();
-                         const timeDiff = now - lastProgressTime;
-                         
-                         if(timeDiff >= 200){ // Update speed every 200ms
-                             updateRealTimeSpeed(bytesSinceLastProgress, timeDiff);
-                             bytesSinceLastProgress = 0;
-                             lastProgressTime = now;
-                         }
-
-                         updateDataUsageDisplay();
+                         // Data usage is being tracked internally, but not displayed in meters.
                     }
                 };
 
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        resolve();
-                    } else {
-                        reject();
-                    }
-                };
-                
-                xhr.onerror = () => reject();
+                xhr.onload = () => resolve();
+                xhr.onerror = () => resolve();
                 xhr.onabort = () => resolve();
-                xhr.ontimeout = () => reject();
+                xhr.ontimeout = () => resolve();
 
                 xhr.send();
             }).finally(() => {
@@ -402,53 +191,44 @@
 
             continueTesting = true;
             refreshButton.classList.add('testing');
+            testStatusElement.style.display = 'block';
 
             while (continueTesting) {
-                const downloadPromises = [];
-                for (let i = 0; i < CONCURRENT_DOWNLOADS; i++) {
-                    downloadPromises.push(runSingleDownload());
-                }
-
-                try {
+                if (!isPaused) {
+                    const downloadPromises = [];
+                    for (let i = 0; i < CONCURRENT_DOWNLOADS; i++) {
+                        downloadPromises.push(runSingleDownload());
+                    }
                     await Promise.all(downloadPromises);
-                } catch (error) {
-                    console.error("One or more downloads failed. Continuing...");
+                } else {
+                    // If paused, wait for a moment before checking again
+                    await new Promise(resolve => setTimeout(resolve, 200));
                 }
 
                 if (!continueTesting) break;
             }
             
-            realtimeMbpsElement.textContent = '0.00';
-            realtimeMbsElement.textContent = '0.00';
+            testStatusElement.style.display = 'none';
             refreshButton.classList.remove('testing');
         }
 
         refreshButton.addEventListener('click', () => {
-            // Stop any ongoing test
-            if (continueTesting) {
-                continueTesting = false; 
-                activeXHRs.forEach(xhr => xhr.abort());
-                activeXHRs = [];
-            }
-            
-            // Reset counters and storage
-            totalDownloadedBytes = 0;
-            localStorage.removeItem(STORAGE_KEY);
-            updateDataUsageDisplay();
-            
-            // Start a new test
+            resetTest();
             setTimeout(startContinuousTesting, 100);
         });
 
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem(STORAGE_KEY, totalDownloadedBytes);
+        pauseButton.addEventListener('click', () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseButton.innerHTML = '&#9658;'; // Play icon
+            } else {
+                pauseButton.innerHTML = '&#10074;&#10074;'; // Pause icon
+            }
         });
 
         window.onload = () => {
-            updateDataUsageDisplay();
             startContinuousTesting();
         };
-
     </script>
 </body>
 </html>
