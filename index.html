@@ -203,11 +203,20 @@
         async function startContinuousTesting() {
             if (continueTesting) return; 
 
+            // Approximately 300 MB in bytes for the auto-reset threshold
+            const RESET_THRESHOLD_BYTES = 300 * 1024 * 1024;
+
             continueTesting = true;
             refreshButton.classList.add('testing');
             testStatusElement.style.display = 'block';
 
             while (continueTesting) {
+                // Check if the total downloaded data has reached the threshold
+                if (totalDownloadedBytes >= RESET_THRESHOLD_BYTES) {
+                    // Automatically reset the data counter without stopping the test
+                    totalDownloadedBytes = 0;
+                }
+
                 if (!isPaused) {
                     const downloadPromises = [];
                     for (let i = 0; i < CONCURRENT_DOWNLOADS; i++) {
