@@ -163,25 +163,39 @@
         }
 
         function runSingleDownload() {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 activeXHRs.push(xhr);
                 
+                let lastLoaded = 0;
+
+                // Unique URL to prevent caching
                 xhr.open('GET', `${DOWNLOAD_TEST_FILE}?r=${Date.now()}&i=${Math.random()}`, true);
                 
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable) {
-                         // Data usage is being tracked internally, but not displayed in meters.
+                         const bytesDiff = event.loaded - lastLoaded;
+                         totalDownloadedBytes += bytesDiff;
+                         lastLoaded = event.loaded;
+                         // Data usage is tracked in the background without updating UI meters.
                     }
                 };
 
-                xhr.onload = () => resolve();
-                xhr.onerror = () => resolve();
-                xhr.onabort = () => resolve();
-                xhr.ontimeout = () => resolve();
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        resolve();
+                    } else {
+                        reject(new Error(`Request failed with status: ${xhr.status}`));
+                    }
+                };
+                
+                xhr.onerror = () => reject(new Error("Network error during download."));
+                xhr.onabort = () => resolve(); // An intentional abort is not an error.
+                xhr.ontimeout = () => reject(new Error("The request timed out."));
 
                 xhr.send();
             }).finally(() => {
+                // Remove the XHR object from the active list once it's complete.
                 activeXHRs = activeXHRs.filter(x => x !== xhr);
             });
         }
@@ -199,21 +213,27 @@
                     for (let i = 0; i < CONCURRENT_DOWNLOADS; i++) {
                         downloadPromises.push(runSingleDownload());
                     }
-                    await Promise.all(downloadPromises);
+                    try {
+                        await Promise.all(downloadPromises);
+                    } catch (error) {
+                        console.error("One or more downloads failed, but the test will continue.", error);
+                    }
                 } else {
-                    // If paused, wait for a moment before checking again
+                    // If paused, wait for a moment before checking again.
                     await new Promise(resolve => setTimeout(resolve, 200));
                 }
 
                 if (!continueTesting) break;
             }
             
+            // Cleanup UI when testing stops.
             testStatusElement.style.display = 'none';
             refreshButton.classList.remove('testing');
         }
 
         refreshButton.addEventListener('click', () => {
             resetTest();
+            // Start a new test after a brief moment.
             setTimeout(startContinuousTesting, 100);
         });
 
@@ -226,6 +246,7 @@
             }
         });
 
+        // Automatically start the test when the page loads.
         window.onload = () => {
             startContinuousTesting();
         };
