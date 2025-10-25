@@ -14,61 +14,56 @@
             color: #424242;
             overflow: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hide original elements */
+        .meter, .real-time-meter, footer, .central-logo, .meter-logo {
+            display: none;
         }
 
         /* Central Controls */
         .controls-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-        
-        /* Big Central Logo */
-        .central-logo {
-            font-size: 80px;
-            font-weight: bold;
-            position: relative;
-            margin-bottom: 25px;
-            color: #000;
-        }
-        
-        .central-logo::before {
-            content: '';
-            position: absolute;
-            width: 120px;
-            height: 60px;
-            border: 14px solid #E50914;
-            border-bottom: none;
-            border-radius: 120px 120px 0 0;
-            top: -80px;
-            left: 50%;
-            transform: translateX(-50%);
+            text-align: center;
         }
 
-        .central-logo::after {
-            content: '';
-            position: absolute;
-            width: 60px;
-            height: 30px;
-            border: 12px solid #E50914;
-            border-bottom: none;
-            border-radius: 60px 60px 0 0;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
+        #status-text {
+            font-size: 36px;
+            font-weight: 300;
+            color: #424242;
+            margin-bottom: 30px;
         }
 
-        .button-container {
+        .button-wrapper {
             display: flex;
-            gap: 15px;
-            margin-top: 15px;
+            align-items: center;
+            gap: 20px; /* Space between buttons */
         }
 
-        .control-button {
+        #pause-button {
+            padding: 10px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 2px solid #E50914;
+            background-color: #E50914;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            width: 120px; /* Fixed width for consistency */
+        }
+
+        #pause-button:hover {
+            background-color: #c00711;
+            border-color: #c00711;
+        }
+
+        #refresh-button {
             width: 40px;
             height: 40px;
             border: 2px solid #9E9E9E;
@@ -87,79 +82,75 @@
         #refresh-button.testing {
             transform: rotate(360deg);
         }
-        
-        #test-status {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #424242;
-            display: none; /* Initially hidden */
-        }
-
-        /* Footer */
-        footer {
-            width: 100%;
-            text-align: right;
-            padding: 20px;
-            box-sizing: border-box;
-            font-size: 12px;
-            color: #9E9E9E;
-            position: fixed;
-            bottom: 0;
-            right: 0;
-        }
-        
-        .powered-by {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: bold;
-            color: #BDBDBD;
-        }
-
-        .netflix-logo {
-            color: #E50914;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
+
+    <!-- Hidden Data Meters -->
+    <div class="meter" id="meter-megabit"><div class="data-usage-container"><span class="data-usage-value" id="megabit-value">0.00</span></div></div>
+    <div class="meter" id="meter-megabyte"><div class="data-usage-container"><span class="data-usage-value" id="megabyte-value">0.00</span></div></div>
+    <div class="meter" id="meter-gigabit"><div class="data-usage-container"><span class="data-usage-value" id="gigabit-value">0.00</span></div></div>
+    <div class="meter" id="meter-gigabyte"><div class="data-usage-container"><span class="data-usage-value" id="gigabyte-value-disp">0.00</span></div></div>
+    <div class="meter" id="meter-terabit"><div class="data-usage-container"><span class="data-usage-value" id="terabit-value">0.00</span></div></div>
+    <div class="meter" id="meter-terabyte"><div class="data-usage-container"><span class="data-usage-value" id="terabyte-value">0.00</span></div></div>
+    <div class="real-time-meter" id="meter-realtime-mbps"><div class="data-usage-container"><span class="data-usage-value" id="realtime-mbps">0.00</span></div></div>
+    <div class="real-time-meter" id="meter-realtime-mbs"><div class="data-usage-container"><span class="data-usage-value" id="realtime-mbs">0.00</span></div></div>
+    <footer></footer>
+
     <!-- Central Controls -->
     <div class="controls-container">
-        <div class="central-logo">FAST</div>
-        <div class="button-container">
-            <button id="refresh-button" class="control-button">&#8635;</button>
-            <button id="pause-button" class="control-button">&#10074;&#10074;</button>
+        <h1 id="status-text">Test Running...</h1>
+        <div class="button-wrapper">
+            <button id="pause-button">Pause</button>
+            <button id="refresh-button">&#8635;</button>
         </div>
-        <div id="test-status">Test Running...</div>
     </div>
 
-    <footer>
-        <span class="powered-by">POWERED BY <span class="netflix-logo">NETFLIX</span></span>
-    </footer>
-
     <script>
+        // Element references (even for hidden ones to keep logic working)
+        const megabitElement = document.getElementById('megabit-value');
+        const megabyteElement = document.getElementById('megabyte-value');
+        const gigabitElement = document.getElementById('gigabit-value');
+        const gigabyteElement = document.getElementById('gigabyte-value-disp');
+        const terabitElement = document.getElementById('terabit-value');
+        const terabyteElement = document.getElementById('terabyte-value');
+        const realtimeMbpsElement = document.getElementById('realtime-mbps');
+        const realtimeMbsElement = document.getElementById('realtime-mbs');
+        
+        // Control elements
         const refreshButton = document.getElementById('refresh-button');
         const pauseButton = document.getElementById('pause-button');
-        const testStatusElement = document.getElementById('test-status');
+        const statusText = document.getElementById('status-text');
         
+        // Test configuration
         const DOWNLOAD_TEST_FILE = 'https://cachefly.cachefly.net/10mb.test';
         const CONCURRENT_DOWNLOADS = 10;
+        const STORAGE_KEY = 'totalDataUsed';
         
+        // State variables
         let continueTesting = false;
         let isPaused = false;
         let activeXHRs = [];
-        let totalDownloadedBytes = 0;
+        let totalDownloadedBytes = parseFloat(localStorage.getItem(STORAGE_KEY)) || 0;
         
-        function resetTest() {
-            if (continueTesting) {
-                continueTesting = false; 
-                activeXHRs.forEach(xhr => xhr.abort());
-                activeXHRs = [];
-            }
-            
-            totalDownloadedBytes = 0;
-            isPaused = false;
-            pauseButton.innerHTML = '&#10074;&#10074;';
-            testStatusElement.style.display = 'none';
-            refreshButton.classList.remove('testing');
+        let lastProgressTime = Date.now();
+        let bytesSinceLastProgress = 0;
+
+        function updateDataUsageDisplay() {
+            const megabytes = totalDownloadedBytes / (1024 * 1024);
+            // The rest of the calculations are kept for data integrity but are not displayed
+            megabitElement.textContent = ((totalDownloadedBytes * 8) / (1024 * 1024)).toFixed(2);
+            megabyteElement.textContent = megabytes.toFixed(2);
+            gigabitElement.textContent = ((totalDownloadedBytes * 8) / (1024 * 1024 * 1024)).toFixed(2);
+            gigabyteElement.textContent = (totalDownloadedBytes / (1024 * 1024 * 1024)).toFixed(2);
+            terabitElement.textContent = ((totalDownloadedBytes * 8) / (1024 * 1024 * 1024 * 1024)).toFixed(2);
+            terabyteElement.textContent = (totalDownloadedBytes / (1024 * 1024 * 1024 * 1024)).toFixed(2);
+        }
+
+        function updateRealTimeSpeed(bytes, durationMs) {
+            // This function is not visually represented but can be used for debugging
+            if (durationMs === 0) return;
+            // ... calculations ...
         }
 
         function runSingleDownload() {
@@ -169,33 +160,33 @@
                 
                 let lastLoaded = 0;
 
-                // Unique URL to prevent caching
                 xhr.open('GET', `${DOWNLOAD_TEST_FILE}?r=${Date.now()}&i=${Math.random()}`, true);
                 
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable) {
                          const bytesDiff = event.loaded - lastLoaded;
                          totalDownloadedBytes += bytesDiff;
+                         bytesSinceLastProgress += bytesDiff;
                          lastLoaded = event.loaded;
-                         // Data usage is tracked in the background without updating UI meters.
+                         
+                         const now = Date.now();
+                         const timeDiff = now - lastProgressTime;
+                         
+                         if(timeDiff >= 200){
+                             updateRealTimeSpeed(bytesSinceLastProgress, timeDiff);
+                             bytesSinceLastProgress = 0;
+                             lastProgressTime = now;
+                         }
+                         updateDataUsageDisplay();
                     }
                 };
 
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        resolve();
-                    } else {
-                        reject(new Error(`Request failed with status: ${xhr.status}`));
-                    }
-                };
-                
-                xhr.onerror = () => reject(new Error("Network error during download."));
-                xhr.onabort = () => resolve(); // An intentional abort is not an error.
-                xhr.ontimeout = () => reject(new Error("The request timed out."));
-
+                xhr.onload = () => (xhr.status === 200 ? resolve() : reject());
+                xhr.onerror = () => reject();
+                xhr.onabort = () => resolve();
+                xhr.ontimeout = () => reject();
                 xhr.send();
             }).finally(() => {
-                // Remove the XHR object from the active list once it's complete.
                 activeXHRs = activeXHRs.filter(x => x !== xhr);
             });
         }
@@ -203,62 +194,71 @@
         async function startContinuousTesting() {
             if (continueTesting) return; 
 
-            // Approximately 300 MB in bytes for the auto-reset threshold
-            const RESET_THRESHOLD_BYTES = 300 * 1024 * 1024;
-
             continueTesting = true;
+            isPaused = false;
+            statusText.textContent = 'Test Running...';
+            pauseButton.textContent = 'Pause';
             refreshButton.classList.add('testing');
-            testStatusElement.style.display = 'block';
 
             while (continueTesting) {
-                // Check if the total downloaded data has reached the threshold
-                if (totalDownloadedBytes >= RESET_THRESHOLD_BYTES) {
-                    // Automatically reset the data counter without stopping the test
-                    totalDownloadedBytes = 0;
+                const downloadPromises = Array.from({ length: CONCURRENT_DOWNLOADS }, () => runSingleDownload());
+                try {
+                    await Promise.all(downloadPromises);
+                } catch (error) {
+                    console.error("One or more downloads failed. Continuing...");
                 }
-
-                if (!isPaused) {
-                    const downloadPromises = [];
-                    for (let i = 0; i < CONCURRENT_DOWNLOADS; i++) {
-                        downloadPromises.push(runSingleDownload());
-                    }
-                    try {
-                        await Promise.all(downloadPromises);
-                    } catch (error) {
-                        console.error("One or more downloads failed, but the test will continue.", error);
-                    }
-                } else {
-                    // If paused, wait for a moment before checking again.
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                }
-
                 if (!continueTesting) break;
             }
             
-            // Cleanup UI when testing stops.
-            testStatusElement.style.display = 'none';
             refreshButton.classList.remove('testing');
         }
 
-        refreshButton.addEventListener('click', () => {
-            resetTest();
-            // Start a new test after a brief moment.
-            setTimeout(startContinuousTesting, 100);
-        });
-
+        // Pause/Resume Button Functionality
         pauseButton.addEventListener('click', () => {
             isPaused = !isPaused;
             if (isPaused) {
-                pauseButton.innerHTML = '&#9658;'; // Play icon
+                // Pause the test
+                continueTesting = false;
+                activeXHRs.forEach(xhr => xhr.abort());
+                activeXHRs = [];
+                statusText.textContent = 'Test Paused';
+                pauseButton.textContent = 'Resume';
             } else {
-                pauseButton.innerHTML = '&#10074;&#10074;'; // Pause icon
+                // Resume the test
+                startContinuousTesting();
             }
         });
 
-        // Automatically start the test when the page loads.
+        // Refresh (Reset) Button Functionality
+        refreshButton.addEventListener('click', () => {
+            // Stop any ongoing test
+            continueTesting = false; 
+            activeXHRs.forEach(xhr => xhr.abort());
+            activeXHRs = [];
+            
+            // Reset counters and storage
+            totalDownloadedBytes = 0;
+            localStorage.removeItem(STORAGE_KEY);
+            updateDataUsageDisplay();
+            
+            // Ensure UI is in a running state
+            if (isPaused) {
+                isPaused = false;
+            }
+            
+            // Start a new test after a short delay
+            setTimeout(startContinuousTesting, 100);
+        });
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem(STORAGE_KEY, totalDownloadedBytes);
+        });
+
         window.onload = () => {
+            updateDataUsageDisplay();
             startContinuousTesting();
         };
+
     </script>
 </body>
 </html>
